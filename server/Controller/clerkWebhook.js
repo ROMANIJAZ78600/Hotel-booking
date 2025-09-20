@@ -1,0 +1,45 @@
+import User from "../models/User";
+import { Webhook } from "svix";
+
+const clerkwebhook = async () => {
+  try {
+    //create a svix hook
+    const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+    const headers = {
+      "svix-id": req.headers["svix-id"],
+      "svix-timestamps": req.headers["svix-timestamps"],
+      "svix-signature": req.headers["svix-signature"],
+    };
+    //verify headers
+    await whook.verify(JSON.stringify(req.body), headers);
+    //get data from req body
+    const { data, type } = req.body;
+    const userData = {
+      _id: data.id,
+      email: data.email_addresses[0].email_address,
+      username: data.first_name + " " + data.last_name,
+      image: data.image_url,
+    };
+    //switch cases for different events
+    switch (type) {
+      case "user.created": {
+        await User.create(userData);
+        break;
+      }
+      case "user.updated": {
+        await User.findBByIdAndUpdate(data.id, userData);
+        break;
+      }
+      case "user.deleted": {
+        await User.findBByIdAndDelete(data.id);
+        break;
+      }
+    }
+    res.json({ success: true, message: "Webhook Recieved" });
+  } catch (error) {
+    console.log(error.message);
+    res.json({ succes: false, message: error.message });
+  }
+};
+
+export default clerkwebhook;
