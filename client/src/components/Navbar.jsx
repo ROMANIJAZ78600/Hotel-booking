@@ -1,7 +1,8 @@
 import {React, useState,useEffect} from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {assets} from '../assets/assets'
-import { useClerk, useUser, UserButton } from '@clerk/clerk-react';
+import { useClerk, UserButton } from '@clerk/clerk-react';
+import { useAppContext } from '../Context/AppContext';
 
 
 const BookIcon = ()=>(
@@ -22,9 +23,10 @@ const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const {openSignIn} = useClerk()
-    const {user} = useUser()
-    const navigate = useNavigate()
+    
     const location = useLocation()
+
+    const {user, navigate, isOwner, setshowhotelreg} = useAppContext()
 
 
     useEffect(() => {
@@ -59,9 +61,9 @@ const Navbar = () => {
                             <div className={`${isScrolled ? "bg-gray-700" : "bg-white"} h-0.5 w-0 group-hover:w-full transition-all duration-300`} />
                         </Link>
                     ))}
-                    <button onClick={()=>navigate('/owner')} className={`border px-4 py-1 text-sm font-light rounded-full cursor-pointer ${isScrolled ? 'text-black' : 'text-white'} transition-all`}>
-                        Dashboard
-                    </button>
+                   {user && ( <button onClick={()=> isOwner?  navigate('/owner') : setshowhotelreg(true)} className={`border px-4 py-1 text-sm font-light rounded-full cursor-pointer ${isScrolled ? 'text-black' : 'text-white'} transition-all`}>
+                        {isOwner ? 'Dashboard' : 'List Your hotel'}
+                    </button>)}
                 </div>
 
                 {/* Desktop Right */}
@@ -102,9 +104,9 @@ const Navbar = () => {
                             {link.name}
                         </Link>
                     ))}
-                   {user && <button onClick={()=>navigate('/owner')} className="border px-4 py-1 text-sm font-light rounded-full cursor-pointer transition-all">
-                        Dashboard
-                    </button>}
+                   {user && (<button onClick={()=> isOwner?  navigate('/owner') : setshowhotelreg(true)} className="border px-4 py-1 text-sm font-light rounded-full cursor-pointer transition-all">
+                         {isOwner ? "Dashboard" : "List Your hotel"}
+                    </button>)}
                     
 
                    {!user && <button onClick={openSignIn} className="bg-black text-white px-8 py-2.5 rounded-full transition-all duration-500">

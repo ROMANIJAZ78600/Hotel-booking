@@ -1,4 +1,4 @@
-import User from "../models/User";
+import User from "../models/User.js";
 import { Webhook } from "svix";
 
 const clerkwebhook = async () => {
@@ -20,6 +20,7 @@ const clerkwebhook = async () => {
       username: data.first_name + " " + data.last_name,
       image: data.image_url,
     };
+
     //switch cases for different events
     switch (type) {
       case "user.created": {
@@ -27,11 +28,11 @@ const clerkwebhook = async () => {
         break;
       }
       case "user.updated": {
-        await User.findBByIdAndUpdate(data.id, userData);
+        await User.findByIdAndUpdate(data.id, userData);
         break;
       }
       case "user.deleted": {
-        await User.findBByIdAndDelete(data.id);
+        await User.findByIdAndDelete(data.id);
         break;
       }
     }
