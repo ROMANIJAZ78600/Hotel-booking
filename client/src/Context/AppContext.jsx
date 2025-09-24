@@ -16,14 +16,14 @@ export const AppProvider = ({children})=>{
     const {getToken} = useAuth()
     const [isOwner , setisOwner] = useState(false)
     const [showhotelreg, setshowhotelreg] = useState(false)
-    const [searccity, setserachcity] = useState()
+    const [searchcity, setsearchcity] = useState()
 
 const fetchuser = async ()=>{
     try {
        const data=  await axios.get('/api/user', {headers: {Authorization: `Bearer ${await getToken({})}`}})
         if(data.success){
             setisOwner(data.role === "hotelOwner")
-             setserachcity(data.recentSearchCities)
+             setsearchcity(data.recentSearchCities)
         } else{
             setTimeout(()=>{
                 fetchuser()
@@ -49,8 +49,8 @@ useEffect(()=>{
            isOwner,setisOwner,
            showhotelreg,setshowhotelreg,
            axios,
-           searccity,
-           setserachcity
+           searchcity,
+           setsearchcity
     }
   return (
     <AppContext.Provider value={value}>
