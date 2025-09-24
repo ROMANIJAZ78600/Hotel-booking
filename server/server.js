@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(clerkMiddleware());
 
 //api to listen clerk whook
-app.use("/api/clerk", clerkwebhook);
+app.post("/api/clerk", clerkwebhook);
 app.use("/api/user", userRouter);
 app.use("/api/hotels", hotelroute);
 app.use("/api/room", roomrouter);

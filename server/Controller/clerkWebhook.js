@@ -1,13 +1,15 @@
 import User from "../models/User.js";
 import { Webhook } from "svix";
 
-const clerkwebhook = async () => {
+const clerkwebhook = async (req, res) => {
   try {
     //create a svix hook
+
+    console.log("i am running");
     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
     const headers = {
       "svix-id": req.headers["svix-id"],
-      "svix-timestamps": req.headers["svix-timestamps"],
+      "svix-timestamp": req.headers["svix-timestamp"],
       "svix-signature": req.headers["svix-signature"],
     };
     //verify headers

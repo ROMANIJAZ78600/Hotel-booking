@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 
 const authmiddleware = async (req, res, next) => {
-  const { userId } = req.auth;
+  const { userId } = await req.auth;
   if (!userId) {
     res.json({ success: false, message: "not authorized" });
   } else {
