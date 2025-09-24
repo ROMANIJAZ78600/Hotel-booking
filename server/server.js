@@ -33,7 +33,7 @@ app.use("/api/bookings", bookingrouter);
 
 // enable cross-origin resource sharing
 
-app.get("/", (req, res) => res.send("Api is working"));
+app.get("/", (req, res) => res.send("Api is running"));
 
 const port = process.env.PORT || 3000;
 
