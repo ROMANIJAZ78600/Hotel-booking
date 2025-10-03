@@ -13,7 +13,10 @@ import bookingrouter from "./routes/bookingroute.js";
 connect();
 connectcloudinary();
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",  // your React dev server
+  credentials: true,                 // if using cookies/auth headers
+}));
 //middleware
 app.use(express.json());
 app.use(clerkMiddleware());
