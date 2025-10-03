@@ -1,6 +1,5 @@
 import booking from "../models/bookings.js";
-import hotel from "../models/Hotel.js";
-
+import Hotel from "../models/Hotel.js";
 import Room from "../models/room.js";
 export const checkAvailability = async ({
   checkindate,
@@ -16,7 +15,7 @@ export const checkAvailability = async ({
     const isAvailable = bookings.length === 0;
     return isAvailable;
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 
@@ -52,13 +51,13 @@ export const createbooking = async (req, res) => {
       return res.json({ success: false, message: "Room is not  available " });
     }
     const roomdata = await Room.findById(room).populate("hotel");
-    let totalprice = roomdata.pricePerNight;
+    let totalPrice = roomdata.pricePerNight;
 
     const checkin = new Date(checkindate);
     const checkout = new Date(checkoutdate);
     const timeDiff = checkout.getTime() - checkin.getTime();
     const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    totalprice *= nights;
+    totalPrice *= nights;
 
     const bookings = await booking.create({
       user,
@@ -82,9 +81,10 @@ export const createbooking = async (req, res) => {
 export const getUserbookings = async (req, res) => {
   try {
     const user = req.user._id;
-    const bookings = (await booking.find({ user }).populate("room hotel")).sort(
-      { createdAt: -1 }
-    );
+    const bookings = await booking
+      .find({ user })
+      .populate("room hotel")
+      .sort({ createdAt: -1 });
     res.json({
       success: true,
       bookings,
@@ -96,8 +96,10 @@ export const getUserbookings = async (req, res) => {
 
 export const gethotelbookings = async (req, res) => {
   try {
-    const Hotel = await hotel.findOne({ owner: req.auth.userId });
-    if (!Hotel) {
+    const hotel = await Hotel.findOne({
+      owner: req.auth.userId,
+    });
+    if (!hotel) {
       return res.json({ success: false, message: "No hotel Found" });
     }
     const bookings = await booking
@@ -107,9 +109,7 @@ export const gethotelbookings = async (req, res) => {
 
     const totalbookings = bookings.length;
 
-    const totalRevenue = bookings.reduce(
-      (acc, booking) => acc + booking.totalPrice
-    );
+    const totalRevenue = bookings.reduce((acc, b) => acc + b.totalPrice);
     res.json({
       success: true,
       dashboaarddata: { totalbookings, totalRevenue, bookings },

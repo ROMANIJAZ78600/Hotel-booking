@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast"
 
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL
 
+
 const AppContext = createContext()
 
 export const AppProvider = ({children})=>{
@@ -20,7 +21,7 @@ export const AppProvider = ({children})=>{
 
 const fetchuser = async ()=>{
     try {
-       const data=  await axios.get('/api/user', {headers: {Authorization: `Bearer ${await getToken({})}`}})
+       const {data}=  await axios.get('/api/user', {headers: {Authorization: `Bearer ${await getToken({})}`}})
         if(data.success){
             setisOwner(data.role === "hotelOwner")
              setsearchcity(data.recentSearchCities)

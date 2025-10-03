@@ -1,4 +1,4 @@
-import {React, useState,useEffect} from 'react'
+import { useState,useEffect} from 'react'
 import { Link, useLocation } from 'react-router-dom';
 import {assets} from '../assets/assets'
 import { useClerk, UserButton } from '@clerk/clerk-react';
@@ -75,7 +75,7 @@ const Navbar = () => {
                     <UserButton.MenuItems>
                         <UserButton.Action label='My Bookings' labelIcon={BookIcon} onClick={()=> navigate('/my-bookings')} />
                     </UserButton.MenuItems>
-                   </UserButton>):
+                   </UserButton>) :
                    ( <button onClick={openSignIn} className={`px-8 py-2.5 rounded-full ml-4 transition-all duration-500 ${isScrolled ? "text-white bg-black" : "bg-white text-black"}`}>
                         Login
                     </button>)}

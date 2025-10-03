@@ -1,8 +1,14 @@
 import React, { useState } from 'react'
 import Title from '../../components/Title'
 import { assets } from '../../assets/assets'
+import { useAppContext } from '../../Context/AppContext'
+import toast from 'react-hot-toast'
 
 const AddRoom = () => {
+
+
+  const {axios, getToken} = useAppContext()
+  const [loading , setLoading] =useState(false)
   const [images, setImages] = useState({
     1 : null,
     2:null,
@@ -20,8 +26,58 @@ const AddRoom = () => {
       'Pool Access' : false
     }
   })
+  const onSubmithandler =async(e)=>{
+  e.preventDefault();
+  if(!input.roomType || !input.pricePerNight || !input.amenities || !Object.values(images).some(image => image)){
+    toast.error("Please fill the all details.")
+    return;
+  }
+  setLoading(true);
+  try {
+    const formdata = new FormData()
+    formdata.append('roomType', input.roomType)
+    formdata.append('pricePerNight', input.pricePerNight)
+
+    const amenities = Object.keys(input.amenities).filter(key => input.amenities[key])
+    formdata.append('amenities', JSON.stringify(amenities))
+
+
+    Object.keys(images).forEach((key)=>{
+      images[key] && formdata.append('images', images[key])
+    })
+    const {data} = await axios.post('/api/room/', formdata, {headers: {Authorization : `Bearer ${await getToken()}`}})
+    if(data.success){
+      toast.success(data.message)
+      setInput({
+        roomType: '',
+        pricePerNight: 0,
+        amenities: {
+          'Free Wifi': false,
+          'Free Breakfast': false,
+          'Room Service' : false,
+          'Mountain View': false,
+          'Pool Access': false
+        }
+      })
+      setImages({
+        1 : null,
+        2 : null,
+        3 : null,
+        4 : null,
+      })
+    } else{
+      toast.error(data.message)
+    }
+  } catch (error) {
+   
+    toast.error(error.message)
+  }
+  finally{
+    setLoading(false)
+  }
+  }
   return (
-    <form>
+    <form onSubmit={onSubmithandler}>
       <Title align='left' font='outfit' title='Add Room' subtitle='Fill in the details carefully and accurate room
       details, pricing and amenities, to enhance the user booking experience.' /> 
       {/* UPLOAD AREA IMAGES */}
@@ -64,13 +120,13 @@ const AddRoom = () => {
                 <div key={index}>
                     <input type="checkbox" id={`amenities${index + 1}`} checked=
                     {input.amenities[amenity]} 
-                    onChange={e => setInput({...input, amenities: {...input.amenities, [amenity] : !inputs.amenities[amenity]}})} />
+                    onChange={e => setInput({...input, amenities: {...input.amenities, [amenity] : !input.amenities[amenity]}})} />
                     <label htmlFor={`amenities${index + 1}`}>{amenity}</label>
                 </div>
               ))}
         </div>
-        <button className='bg-primary text-white px-8 py-2 rounded mt-8 cursor-pointer'>
-          Add Room 
+        <button className='bg-primary text-white px-8 py-2 rounded mt-8 cursor-pointer' disabled={loading}>
+          {loading? 'Adding....' : 'Add Room' }
         </button>
     </form>
   )

@@ -1,13 +1,15 @@
-import hotel from "../models/Hotel.js";
+import Hotel from "../models/Hotel.js";
 import { v2 as cloudinary } from "cloudinary";
-import room from "../models/room.js";
+import Room from "../models/room.js";
 
 //api too create room
 export const createRoom = async (req, res) => {
   try {
     const { roomType, pricePerNight, amenities } = req.body;
-    const Hotel = await hotel.findOne({ owner: req.auth.userId });
-    if (!Hotel) return res.json({ success: false, message: "No Hotel fouond" });
+    const hotel = await Hotel.findOne({ owner: req.auth.userId });
+    if (!hotel) {
+      return res.json({ success: false, message: "No Hotel fouond" });
+    }
 
     //upload
     const uploadimages = req.files.map(async (file) => {
@@ -16,7 +18,7 @@ export const createRoom = async (req, res) => {
     });
 
     const images = await Promise.all(uploadimages);
-    await room.create({
+    await Room.create({
       hotel: hotel._id,
       roomType,
       pricePerNight: +pricePerNight,
@@ -31,8 +33,7 @@ export const createRoom = async (req, res) => {
 //api to get all rooms
 export const getRooms = async (req, res) => {
   try {
-    const rooms = await room
-      .find({ isAvailable: true })
+    const rooms = await Room.find({ isAvailable: true })
       .populate({
         path: "hotel",
         populate: {
@@ -49,10 +50,10 @@ export const getRooms = async (req, res) => {
 //api to get all rooms for specific hotel
 export const getOwnerRoom = async (req, res) => {
   try {
-    const hoteldata = await hotel({ owner: req.auth.userId });
-    const rooms = await room
-      .find({ hotel: hoteldata._id.toString() })
-      .populate("hotel");
+    const hoteldata = await Hotel.findOne({ owner: req.auth.userId });
+    const rooms = await Room.find({ hotel: hoteldata._id.toString() }).populate(
+      "hotel"
+    );
     res.json({ success: true, rooms });
   } catch (error) {
     res.json({ success: false, message: error.message });
@@ -62,7 +63,7 @@ export const getOwnerRoom = async (req, res) => {
 export const availroom = async (req, res) => {
   try {
     const { roomId } = req.body;
-    const roomdata = await room.findById(roomId);
+    const roomdata = await Room.findById(roomId);
     roomdata.isAvailable = !roomdata.isAvailable;
     await roomdata.save();
     res.json({ success: true, message: "Room availability updated" });
