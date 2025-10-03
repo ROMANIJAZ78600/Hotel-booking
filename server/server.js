@@ -14,8 +14,9 @@ connect();
 connectcloudinary();
 const app = express();
 app.use(cors({
-  origin: "http://localhost:5173",  // your React dev server
-  credentials: true,                 // if using cookies/auth headers
+    origin: "http://localhost:5173",
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,                // if using cookies/auth headers
 }));
 //middleware
 app.use(express.json());
